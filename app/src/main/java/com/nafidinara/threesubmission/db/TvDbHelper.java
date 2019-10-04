@@ -12,15 +12,15 @@ public class TvDbHelper extends SQLiteOpenHelper {
 
     private static final String SQL_CREATE_TABLE_TV = String.format(
             "CREATE TABLE %s" +
-                    " (%s TEXT NULL," +
-                    " %s TEXT NULL," +
-                    " %s TEXT NULL," +
-                    " %s TEXT NULL," +
-                    " %s TEXT NULL," +
-                    " %s TEXT NULL," +
-                    " %s TEXT NULL," +
-                    " %s TEXT NULL," +
-                    " %s TEXT NULL)",
+                    " (%s INTEGER PRIMARY KEY," +
+                    " %s TEXT NOT NULL," +
+                    " %s TEXT NOT NULL," +
+                    " %s TEXT NOT NULL," +
+                    " %s TEXT NOT NULL," +
+                    " %s TEXT NOT NULL," +
+                    " %s TEXT NOT NULL," +
+                    " %s TEXT NOT NULL," +
+                    " %s TEXT NOT NULL)",
             TABLE_TV_NAME,
             TvColumns.ID,
             TvColumns.TITLE,
@@ -44,7 +44,7 @@ public class TvDbHelper extends SQLiteOpenHelper {
         db.execSQL("DROP TABLE IF EXISTS " +TABLE_TV_NAME);
         onCreate(db);
     }
-    TvDbHelper (Context context){
+    public TvDbHelper (Context context){
         super(context, TV_DB_NAME,null,TV_DB_VERSION);
     }
 }

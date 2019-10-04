@@ -13,15 +13,15 @@ public class MovieDbHelper extends SQLiteOpenHelper {
 
     private static final String SQL_CREATE_TABLE_MOVIE = String.format(
             "CREATE TABLE %s" +
-                    " (%s TEXT NULL," +
-                    " %s TEXT NULL," +
-                    " %s TEXT NULL," +
-                    " %s TEXT NULL," +
-                    " %s TEXT NULL," +
-                    " %s TEXT NULL," +
-                    " %s TEXT NULL," +
-                    " %s TEXT NULL," +
-                    " %s TEXT NULL)",
+                    " (%s INTEGER PRIMARY KEY," +
+                    " %s TEXT NOT NULL," +
+                    " %s TEXT NOT NULL," +
+                    " %s TEXT NOT NULL," +
+                    " %s TEXT NOT NULL," +
+                    " %s TEXT NOT NULL," +
+                    " %s TEXT NOT NULL," +
+                    " %s TEXT NOT NULL," +
+                    " %s TEXT NOT NULL)",
             TABLE_MOVIE_NAME,
             MovieColumns.ID,
             MovieColumns.TITLE,
@@ -44,7 +44,7 @@ public class MovieDbHelper extends SQLiteOpenHelper {
         db.execSQL("DROP TABLE IF EXISTS " +TABLE_MOVIE_NAME);
         onCreate(db);
     }
-    MovieDbHelper (Context context){
+    public MovieDbHelper (Context context){
         super(context, MOVIE_DB_NAME,null,MOVIE_DB_VERSION);
     }
 }

@@ -28,7 +28,7 @@ public class TvHelper {
     private static TvHelper INST;
     private static SQLiteDatabase db;
 
-    private TvHelper (Context context){
+    public TvHelper (Context context){
         tvDbHelper = new TvDbHelper(context);
     }
 

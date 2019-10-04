@@ -1,6 +1,7 @@
 package com.nafidinara.threesubmission.activity;
 
-import android.content.Intent;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -14,10 +15,14 @@ import android.widget.Toast;
 import com.bumptech.glide.Glide;
 import com.github.ivbaranov.mfb.MaterialFavoriteButton;
 import com.nafidinara.threesubmission.R;
+import com.nafidinara.threesubmission.db.MovieDbContract;
+import com.nafidinara.threesubmission.db.MovieDbHelper;
 import com.nafidinara.threesubmission.db.MovieHelper;
 import com.nafidinara.threesubmission.model.Movie;
 
 import java.util.ArrayList;
+
+import static com.nafidinara.threesubmission.db.MovieDbContract.MovieColumns.TABLE_MOVIE_NAME;
 
 public class DetailMovieActivity extends AppCompatActivity {
     public static final String DATA_MOVIE = "data_movie";
@@ -45,29 +50,67 @@ public class DetailMovieActivity extends AppCompatActivity {
         prepare();
         getMovieDetail();
 
+        if (Exist(movie.getTitle())){
+            favBtn.setFavorite(true);
+            favBtn.setOnFavoriteChangeListener(
+                    new MaterialFavoriteButton.OnFavoriteChangeListener() {
+                        @Override
+                        public void onFavoriteChanged(MaterialFavoriteButton buttonView, boolean favorite) {
+                            if (favorite){
+                                list = movieHelper.getAllMovies();
+                                movieHelper.movieInsert(movie);
+                                Toast toast = Toast.makeText(getApplicationContext(),"Ditambahkan Favorite",Toast.LENGTH_SHORT);
+                                toast.show();
 
-        favBtn.setOnFavoriteChangeListener(
-                new MaterialFavoriteButton.OnFavoriteChangeListener() {
-                    @Override
-                    public void onFavoriteChanged(MaterialFavoriteButton buttonView, boolean favorite) {
-                        if (favorite){
-                            list = movieHelper.getAllMovies();
-                            movieHelper.movieInsert(movie);
-                            Toast toast = Toast.makeText(getApplicationContext(),"Ditambahkan Favorite",Toast.LENGTH_SHORT);
-                            toast.show();
+                            }
+                            else {
+                                list = movieHelper.getAllMovies();
+                                movieHelper.movieDelete(movie.getTitle());
+                                Toast toast = Toast.makeText(getApplicationContext(),"Dihapus Favorite",Toast.LENGTH_SHORT);
+                                toast.show();
+                            }
+                        }
+                    });
 
+        }else {
+            favBtn.setOnFavoriteChangeListener(
+                    new MaterialFavoriteButton.OnFavoriteChangeListener() {
+                        @Override
+                        public void onFavoriteChanged(MaterialFavoriteButton buttonView, boolean favorite) {
+                            if (favorite){
+                                list = movieHelper.getAllMovies();
+                                movieHelper.movieInsert(movie);
+                                Toast toast = Toast.makeText(getApplicationContext(),"Ditambahkan Favorite",Toast.LENGTH_SHORT);
+                                toast.show();
+
+                            }
+                            else {
+                                list = movieHelper.getAllMovies();
+                                movieHelper.movieDelete(movie.getTitle());
+                                Toast toast = Toast.makeText(getApplicationContext(),"Dihapus Favorite",Toast.LENGTH_SHORT);
+                                toast.show();
+                            }
                         }
-                        else {
-                            list = movieHelper.getAllMovies();
-                            movieHelper.movieDelete(movie.getTitle());
-                            Toast toast = Toast.makeText(getApplicationContext(),"Dihapus Favorite",Toast.LENGTH_SHORT);
-                            toast.show();
-                        }
-                    }
-                });
+                    });
+        }
+
     }
 
-
+    public boolean Exist(String item) {
+        String pilih = MovieDbContract.MovieColumns.TITLE+" =?";
+        String[] pilihArg = {item};
+        String limit = "1";
+        movieHelper = new MovieHelper(this);
+        movieHelper.open();
+        MovieDbHelper dataBaseHelper = new MovieDbHelper(DetailMovieActivity.this);
+        SQLiteDatabase database = dataBaseHelper.getWritableDatabase();
+        Cursor cursor = database.query(TABLE_MOVIE_NAME, null, pilih, pilihArg, null, null, null, limit);
+        boolean exists;
+        exists = (cursor.getCount() > 0);
+        cursor.close();
+//        movieHelper.close();
+        return exists;
+    }
 
     private void prepare(){
         title = findViewById(R.id.detail_tv_title);

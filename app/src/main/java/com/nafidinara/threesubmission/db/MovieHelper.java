@@ -29,7 +29,7 @@ public class MovieHelper {
     private static MovieHelper INST;
     private static SQLiteDatabase db;
 
-    private MovieHelper (Context context){
+    public MovieHelper (Context context){
         movieDbHelper = new MovieDbHelper(context);
     }
 

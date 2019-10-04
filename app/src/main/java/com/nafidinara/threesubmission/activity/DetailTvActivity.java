@@ -1,5 +1,7 @@
 package com.nafidinara.threesubmission.activity;
 
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -13,10 +15,14 @@ import android.widget.Toast;
 import com.bumptech.glide.Glide;
 import com.github.ivbaranov.mfb.MaterialFavoriteButton;
 import com.nafidinara.threesubmission.R;
+import com.nafidinara.threesubmission.db.TvDbContract;
+import com.nafidinara.threesubmission.db.TvDbHelper;
 import com.nafidinara.threesubmission.db.TvHelper;
 import com.nafidinara.threesubmission.model.TvShow;
 
 import java.util.ArrayList;
+
+import static com.nafidinara.threesubmission.db.TvDbContract.TvColumns.TABLE_TV_NAME;
 
 public class DetailTvActivity extends AppCompatActivity {
     public static final String DATA_TVSHOW = "data_tvshow";
@@ -45,25 +51,68 @@ public class DetailTvActivity extends AppCompatActivity {
         prepare();
         getTVShowDetail();
 
-        favBtn.setOnFavoriteChangeListener(
-                new MaterialFavoriteButton.OnFavoriteChangeListener() {
-                    @Override
-                    public void onFavoriteChanged(MaterialFavoriteButton buttonView, boolean favorite) {
-                        if (favorite){
-                            list = tvHelper.getAllMovies();
-                            tvHelper.tvInsert(tvShow);
-                            Toast toast = Toast.makeText(getApplicationContext(),"Ditambahkan Favorite",Toast.LENGTH_SHORT);
-                            toast.show();
+        if (Exist(tvShow.getTitle())){
+            favBtn.setFavorite(true);
+            favBtn.setOnFavoriteChangeListener(
+                    new MaterialFavoriteButton.OnFavoriteChangeListener() {
+                        @Override
+                        public void onFavoriteChanged(MaterialFavoriteButton buttonView, boolean favorite) {
+                            if (favorite){
+                                list = tvHelper.getAllMovies();
+                                tvHelper.tvInsert(tvShow);
+                                Toast toast = Toast.makeText(getApplicationContext(),"Ditambahkan Favorite",Toast.LENGTH_SHORT);
+                                toast.show();
 
+                            }
+                            else {
+                                list = tvHelper.getAllMovies();
+                                tvHelper.tvDelete(tvShow.getTitle());
+                                Toast toast = Toast.makeText(getApplicationContext(),"Dihapus Favorite",Toast.LENGTH_SHORT);
+                                toast.show();
+                            }
                         }
-                        else {
-                            list = tvHelper.getAllMovies();
-                            tvHelper.tvDelete(tvShow.getTitle());
-                            Toast toast = Toast.makeText(getApplicationContext(),"Dihapus Favorite",Toast.LENGTH_SHORT);
-                            toast.show();
+                    });
+
+
+        }else {
+            favBtn.setOnFavoriteChangeListener(
+                    new MaterialFavoriteButton.OnFavoriteChangeListener() {
+                        @Override
+                        public void onFavoriteChanged(MaterialFavoriteButton buttonView, boolean favorite) {
+                            if (favorite){
+                                list = tvHelper.getAllMovies();
+                                tvHelper.tvInsert(tvShow);
+                                Toast toast = Toast.makeText(getApplicationContext(),"Ditambahkan Favorite",Toast.LENGTH_SHORT);
+                                toast.show();
+
+                            }
+                            else {
+                                list = tvHelper.getAllMovies();
+                                tvHelper.tvDelete(tvShow.getTitle());
+                                Toast toast = Toast.makeText(getApplicationContext(),"Dihapus Favorite",Toast.LENGTH_SHORT);
+                                toast.show();
+                            }
                         }
-                    }
-                });
+                    });
+
+        }
+
+    }
+
+    public boolean Exist(String item) {
+        String pilih = TvDbContract.TvColumns.TITLE+" =?";
+        String[] pilihArg = {item};
+        String limit = "1";
+        tvHelper = new TvHelper(this);
+        tvHelper.open();
+        TvDbHelper dataBaseHelper = new TvDbHelper(DetailTvActivity.this);
+        SQLiteDatabase database = dataBaseHelper.getWritableDatabase();
+        Cursor cursor = database.query(TABLE_TV_NAME, null, pilih, pilihArg, null, null, null, limit);
+        boolean exists;
+        exists = (cursor.getCount() > 0);
+        cursor.close();
+//        movieHelper.close();
+        return exists;
     }
 
     private void prepare() {
